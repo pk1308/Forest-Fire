@@ -1,0 +1,23 @@
+data_ingestion_config:
+  dataset_download_url: https://archive.ics.uci.edu/ml/machine-learning-databases/00547/Algerian_forest_fires_dataset_UPDATE.csv
+  raw_data_dir: raw_data
+  ingested_dir: ingested_data
+  ingested_train_dir: train
+  ingested_test_dir: test 
+  ingested_collection: ingested_data
+  ingested_train_collection: train
+  ingested_test_collection: test 
+
+
+
+
+data_validation_config:
+  schema_file_name: schema.yaml
+
+data_transformation_config:
+  add_bedroom_per_room: true
+  transformed_dir: transformed_data
+  transformed_train_dir: train
+  transformed_test_dir: test
+  preprocessing_dir: preprocessed
+  preprocessed_object_file_name: preprocessed.pkl
