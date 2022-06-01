@@ -1,7 +1,11 @@
-from app_logger.logger import App_Logger
-from app_exception.exception import AppException
 import yaml,os,sys
 import dill
+import pandas as pd 
+
+from app_logger.logger import App_Logger
+from app_exception.exception import AppException
+from app_database.mongoDB import MongoDB
+
 
 util_logger = App_Logger('util_logger')
 
@@ -55,3 +59,18 @@ def load_object(file_path:str):
 
     except Exception as e:
         raise AppException(e,sys) from e
+
+
+def Read_data_MONGO(Connection :MongoDB , Del_id = True , Query = {}):
+    """ This function take the connection object and read the data from the database and return the dataframe
+    """
+    util_logger.info("Reading the data from the database")
+    try:
+        data = Connection.find_many(query=Query)
+    except Exception as e:
+        raise AppException(e,sys) from e
+    dataFrame = pd.DataFrame(list(data))
+    util_logger.info("Dataframe created successfully")
+    if Del_id:
+         dataFrame.drop(['_id'], axis=1, inplace=True)
+    return  dataFrame

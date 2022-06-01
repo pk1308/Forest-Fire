@@ -41,6 +41,7 @@ DATA_INGESTION_TEST_COLLECTION = "ingested_test_collection"
 # Data Validation related variables
 DATA_VALIDATION_CONFIG_KEY = "data_validation_config"
 DATA_VALIDATION_SCHEMA_FILE_NAME_KEY = "schema_file_name"
+DATA_VALIDATION_CONFIG_DIR = "validation_config_dir"
 
 # Data Transformation related variables
 DATA_TRANSFORMATION_ARTIFACT_DIR = "data_transformation"
@@ -108,9 +109,12 @@ class AppConfiguration:
 
             ingested_test_dir = os.path.join(ingested_dir_name,
                                              data_ingestion_config[DATA_INGESTION_TEST_DIR_KEY])
-            ingested_raw_collection = MongoDB(Collection_Name= data_ingestion_config[DATA_INGESTION_COLLECTION] , drop_collection=True)
-            ingested_train_collection = MongoDB(Collection_Name =data_ingestion_config[DATA_INGESTION_TRAIN_COLLECTION],drop_collection=True)
-            ingested_test_collection = MongoDB(Collection_Name=data_ingestion_config[DATA_INGESTION_TEST_COLLECTION], drop_collection=True)
+            ingested_raw_collection = MongoDB(Collection_Name= data_ingestion_config[DATA_INGESTION_COLLECTION] ,\
+                                            drop_collection=True)
+            ingested_train_collection = MongoDB(Collection_Name =data_ingestion_config[DATA_INGESTION_TRAIN_COLLECTION],\
+                                                drop_collection=True)
+            ingested_test_collection = MongoDB(Collection_Name=data_ingestion_config[DATA_INGESTION_TEST_COLLECTION],\
+                                                drop_collection=True)
 
             response = DataIngestionConfig(dataset_download_url=data_ingestion_config[DATA_INGESTION_DOWNLOAD_URL_KEY],
                                            raw_data_dir=raw_data_dir,
@@ -128,10 +132,19 @@ class AppConfiguration:
 
     def get_data_validation_config(self) -> DataValidationConfig:
         try:
+            data_ingestion_config = self.config_info[DATA_INGESTION_CONFIG_KEY]
+            validation_config_dir = self.config_info[DATA_VALIDATION_CONFIG_DIR]
             data_validation_config = self.config_info[DATA_VALIDATION_CONFIG_KEY]
             schema_file_path = os.path.join(
-                ROOT_DIR, data_validation_config[DATA_VALIDATION_SCHEMA_FILE_NAME_KEY])
-            response = DataValidationConfig(schema_file_path=schema_file_path)
+                ROOT_DIR, validation_config_dir, data_validation_config[DATA_VALIDATION_SCHEMA_FILE_NAME_KEY])
+            ingested_train_collection = MongoDB(Collection_Name =data_ingestion_config[DATA_INGESTION_TRAIN_COLLECTION],\
+                drop_collection=False)
+            ingested_test_collection = MongoDB(Collection_Name=data_ingestion_config[DATA_INGESTION_TEST_COLLECTION],\
+                drop_collection=False)
+
+            response = DataValidationConfig(schema_file_path=schema_file_path,
+                                            Train_collection=ingested_train_collection,
+                                            Test_collection=ingested_test_collection)
             config_log.info(response)
             return response
         except Exception as e:

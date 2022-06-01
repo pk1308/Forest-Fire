@@ -17,6 +17,7 @@ data_ingestion_config:
 
 
 data_validation_config:
+  validation_config_dir: config
   schema_file_name: schema.yaml
 
 data_transformation_config:
