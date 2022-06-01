@@ -1,13 +1,13 @@
 
 import os
 import sys
-from app_config.configuration import ROOT_DIR
+
 
 import pymongo
 
 from app_logger.logger import App_Logger
 from app_exception.exception import AppException
-from app_util import read_yaml_file
+from app_util.util import read_yaml_file
 
 
 
@@ -15,16 +15,16 @@ lg = App_Logger("Database_operations")
 
 ROOT_DIR = os.getcwd()
 CONFIG_DIR = "config"
-DATABASE_CONFIG_FILE_NAME = "database_config.yaml"
+DATABASE_CONFIG_FILE_NAME = "database_config.yml"
 DATABASE_CONFIG_FILE_PATH = os.path.join(ROOT_DIR, CONFIG_DIR, DATABASE_CONFIG_FILE_NAME)
 DATA_BASE_CONFIG = read_yaml_file(DATABASE_CONFIG_FILE_PATH)
-CONNECTION_STRING = DATA_BASE_CONFIG["connection_string"]
-DATABASE_NAME = DATA_BASE_CONFIG["database_name"]
+CONNECTION_STRING = DATA_BASE_CONFIG['MongoDB']['connection_string']
+DATABASE_NAME = DATA_BASE_CONFIG['MongoDB']['database_name']
 
 class MongoDB:
     '''class for mongo db operations'''
 
-    def __init__(self, Collection_Name):
+    def __init__(self, Collection_Name , drop_collection=False):
         """Initialize the class with the database name and collection name
         the class initialization the class with the below argument 
         Args:
@@ -40,6 +40,9 @@ class MongoDB:
             conn = pymongo.MongoClient(CONNECTION_STRING)
             lg.debug('connection to mongo db successful')
             self.__db = conn[DATABASE_NAME]
+            if drop_collection:
+                self.Drop_Collection(Collection_Name)
+                lg.debug(f'drop collection {Collection_Name}from mongo db successful')
             self.__collection = self.__db[Collection_Name]
 
         except Exception as e:
@@ -97,7 +100,7 @@ class MongoDB:
             self.__collection.insert_many(data)
         except Exception as e:
             lg.critical('error in insert many data into mongo db %s', e)
-            print(e)
+            
             raise AppException(e, sys) from e
         lg.debug('insert many data into mongo db successful')
         return True
@@ -137,9 +140,9 @@ class MongoDB:
         if self.checkExistence_COL(collection):
             lg.debug('drop collection found in DB')
             try:
-                lg.debug('drop collection from mongo db')
+                lg.debug(f'drop collection{collection}from mongo db')
                 self.__collection = self.__db[collection]
-                self.collection.drop()
+                self.__collection.drop()
             except Exception as e:
                 lg.critical('error in drop collection from mongo db %s', e)
                 raise AppException(e, sys) from e

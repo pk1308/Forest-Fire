@@ -1,21 +1,24 @@
 
-from app_logger.logger import App_Logger
-from app_exception import AppException
-import os
-import sys
-from app_entity import DataIngestionConfig, DataValidationConfig, DataTransformationConfig, ModelTrainerConfig, \
-    ModelEvaluationConfig
-from app_entity import ModelPusherConfig, TrainingPipelineConfig
-from app_util import read_yaml_file
-from app_database import mongoDB
 from datetime import datetime
 from pathlib import Path
+import os
+import sys
+
+from app_logger.logger import App_Logger
+from app_exception.exception import AppException
+from app_entity.config_entity import DataIngestionConfig, DataValidationConfig, DataTransformationConfig, ModelTrainerConfig, \
+    ModelEvaluationConfig
+from app_entity.config_entity import ModelPusherConfig, TrainingPipelineConfig
+from app_util.util import read_yaml_file
+from app_database.mongoDB import MongoDB
+
 
 config_log = App_Logger("configuration")
 
 ROOT_DIR = os.getcwd()
+ARTIFACTS_DIR = "app_artifacts"
 
-CURRENT_TIME_STAMP = f"{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}"
+CURRENT_TIME_STAMP = f"{datetime.now().strftime('%Y-%m-%d-%H')}"
 # Varibale declaration
 # Data Ingestion related variables
 
@@ -27,7 +30,7 @@ DATA_INGESTION_ARTIFACT_DIR = "data_ingestion"
 DATA_INGESTION_CONFIG_KEY = "data_ingestion_config"
 DATA_INGESTION_DOWNLOAD_URL_KEY = "dataset_download_url"
 DATA_INGESTION_RAW_DATA_DIR_KEY = "raw_data_dir"
-DATA_INGESTION_TGZ_DOWNLOAD_DIR_KEY = "tgz_download_dir"
+
 DATA_INGESTION_DIR_NAME_KEY = "ingested_dir"
 DATA_INGESTION_TRAIN_DIR_KEY = "ingested_train_dir"
 DATA_INGESTION_TEST_DIR_KEY = "ingested_test_dir"
@@ -74,12 +77,6 @@ CONFIG_DIR = "config"
 CONFIG_FILE_NAME = "config.yaml"
 CONFIG_FILE_PATH = os.path.join(ROOT_DIR, CONFIG_DIR, CONFIG_FILE_NAME)
 
-#Database 
-DATABASE_CONFIG_KEY = "database_config"
-DATABASE_HOST_KEY = "connection_string"
-DATABASE_CONFIG_FILE_NAME = "database_config.yaml"
-DATABASE_CONFIG_FILE_PATH = os.path.join(ROOT_DIR, CONFIG_DIR, DATABASE_CONFIG_FILE_NAME)
-
 
 class AppConfiguration:
     def __init__(self, config_file_path: str = CONFIG_FILE_PATH,current_time_stamp:str=CURRENT_TIME_STAMP):
@@ -90,7 +87,6 @@ class AppConfiguration:
         """
         try:
             self.config_info = read_yaml_file(file_path=config_file_path)
-            self.database_config = read_yaml_file(file_path=DATABASE_CONFIG_FILE_PATH)
             self.training_pipeline_config = self.get_training_pipeline_config()
             self.time_stamp = current_time_stamp
         except Exception as e:
@@ -99,14 +95,11 @@ class AppConfiguration:
     def get_data_ingestion_config(self) -> DataIngestionConfig:
         try:
             artifact_dir = os.path.join(
-                self.training_pipeline_config.artifact_dir, DATA_INGESTION_ARTIFACT_DIR, self.time_stamp)
+                ARTIFACTS_DIR, DATA_INGESTION_ARTIFACT_DIR, self.time_stamp)
 
             data_ingestion_config = self.config_info[DATA_INGESTION_CONFIG_KEY]
             raw_data_dir = os.path.join(
                 artifact_dir, data_ingestion_config[DATA_INGESTION_RAW_DATA_DIR_KEY])
-            tgz_download_dir = os.path.join(
-                artifact_dir, data_ingestion_config[DATA_INGESTION_TGZ_DOWNLOAD_DIR_KEY])
-
             ingested_dir_name = os.path.join(artifact_dir,
                                              data_ingestion_config[DATA_INGESTION_DIR_NAME_KEY])
 
@@ -115,13 +108,12 @@ class AppConfiguration:
 
             ingested_test_dir = os.path.join(ingested_dir_name,
                                              data_ingestion_config[DATA_INGESTION_TEST_DIR_KEY])
-            ingested_raw_collection = mongoDB(Collection_Name= data_ingestion_config[DATA_INGESTION_COLLECTION])
-            ingested_train_collection = mongoDB(Collection_Name =data_ingestion_config[DATA_INGESTION_TRAIN_COLLECTION])
-            ingested_test_collection = mongoDB(Collection_Name=data_ingestion_config[DATA_INGESTION_TEST_COLLECTION])
+            ingested_raw_collection = MongoDB(Collection_Name= data_ingestion_config[DATA_INGESTION_COLLECTION] , drop_collection=True)
+            ingested_train_collection = MongoDB(Collection_Name =data_ingestion_config[DATA_INGESTION_TRAIN_COLLECTION],drop_collection=True)
+            ingested_test_collection = MongoDB(Collection_Name=data_ingestion_config[DATA_INGESTION_TEST_COLLECTION], drop_collection=True)
 
             response = DataIngestionConfig(dataset_download_url=data_ingestion_config[DATA_INGESTION_DOWNLOAD_URL_KEY],
                                            raw_data_dir=raw_data_dir,
-                                           tgz_download_dir=tgz_download_dir,
                                            ingested_train_dir=ingested_train_dir,
                                            ingested_test_dir=ingested_test_dir,
                                            raw_data_collection=ingested_raw_collection,

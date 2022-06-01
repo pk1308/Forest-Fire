@@ -7,3 +7,7 @@ pandas
 -e .
 six
 dill
+pandas 
+numpy
+pymongo
+pymongo[srv]

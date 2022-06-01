@@ -1,7 +1,9 @@
 import os
-
 import sys
 
+from app_logger.logger import App_Logger
+
+Exception_log = App_Logger("AppException")
 
 class AppException(Exception):
     """
@@ -32,6 +34,8 @@ class AppException(Exception):
         #preparing error message
         error_message = f"Error occurred python script name [{file_name}]" \
                         f" line number [{exc_tb.tb_lineno}] error message [{error}]."
+
+        Exception_log.error(error_message)
 
         return error_message
 

@@ -1,9 +1,9 @@
-from app_logger import logging
-from app_exception import AppException
+from app_logger.logger import App_Logger
+from app_exception.exception import AppException
 import yaml,os,sys
 import dill
 
-
+util_logger = App_Logger('util_logger')
 
 def write_yaml_file(file_path,data=None):
     """
@@ -17,7 +17,7 @@ def write_yaml_file(file_path,data=None):
             if data is not None:
                 yaml.dump(data,yaml_file)
     except Exception as e:
-        raise e
+        raise AppException(e,sys) from e
 
 
 def read_yaml_file(file_path:str)->dict:

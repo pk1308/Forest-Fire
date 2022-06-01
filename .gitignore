@@ -132,4 +132,13 @@ config/database_config.yml
 
 app_notebook
 
+# vscode
+.vscode/
 
+# if using pycharm
+.idea
+
+# if using VScode
+.vscode
+
+.idea
