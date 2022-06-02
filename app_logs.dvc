@@ -1,0 +1,5 @@
+outs:
+- md5: 6e3b1a9e77e03bade5babca521e885b5.dir
+  size: 1618
+  nfiles: 2
+  path: app_logs

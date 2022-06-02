@@ -142,3 +142,5 @@ app_notebook
 .vscode
 
 .idea
+/app_artifacts
+/app_logs

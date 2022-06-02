@@ -1,0 +1,5 @@
+outs:
+- md5: c568b303a5a729f6e67bfd5d52a4a279.dir
+  size: 163089
+  nfiles: 8
+  path: app_artifacts
