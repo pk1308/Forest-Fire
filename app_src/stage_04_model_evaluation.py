@@ -1,5 +1,3 @@
-from statistics import mode
-from yaml import load
 from app_entity.artifact_entity import DataTransformationArtifact
 from app_logger.logger import App_Logger
 from app_exception.exception import AppException
