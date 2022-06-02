@@ -1,16 +1,14 @@
 
 from datetime import datetime
-from pathlib import Path
 import os
 
-from app_util.util import read_yaml_file
 
 
 ROOT_DIR = os.getcwd()
-ARTIFACTS_DIR = "app_artifacts"
+
 
 CURRENT_TIME_STAMP = f"{datetime.now().strftime('%Y-%m-%d-%H')}"
-# Varibale declaration
+# Variable declaration
 # Data Ingestion related variables
 
 DATASET_SCHEMA_COLUMNS_KEY = "columns"
@@ -51,6 +49,9 @@ MODEL_TRAINER_CONFIG_KEY = "model_trainer_config"
 MODEL_TRAINER_DIR_KEY = "trained_model_dir"
 MODEL_TRAINER_FILE_NAME_KEY = "model_file_name"
 MODEL_TRAINER_BASE_ACCURACY_KEY = "base_accuracy"
+RANDOMFOREST_PARAMS_CONFIG_KEY = "randomforest_params_config"
+SVC_PARAMS_CONFIG_KEY = "svc_params_config"
+GRADIENT_BOOSTING_PARAMS_CONFIG_KEY = "GradientBoost_config"
 
 # Model Evaluation related variables
 
@@ -70,15 +71,12 @@ CONFIG_DIR = "config"
 CONFIG_FILE_NAME = "config.yaml"
 CONFIG_FILE_PATH = os.path.join(ROOT_DIR, CONFIG_DIR, CONFIG_FILE_NAME)
 
-
 DATABASE_CONFIG_FILE_NAME = "database_config.yml"
 DATABASE_CONFIG_FILE_PATH = os.path.join(ROOT_DIR, CONFIG_DIR, DATABASE_CONFIG_FILE_NAME)
-DATA_BASE_CONFIG = read_yaml_file(DATABASE_CONFIG_FILE_PATH)
-CONNECTION_STRING = DATA_BASE_CONFIG['MongoDB']['connection_string']
-DATABASE_NAME = DATA_BASE_CONFIG['MongoDB']['database_name']
 
 
-KNN_KEY = 'KNN_neighbors'
+
+KNN_KEY = 2
 PROCEEDED_TRAIN_FILE_NAME = 'processed_train_file.csv'
 PROCEEDED_TEST_FILE_NAME = 'processed_test_file.csv'
 

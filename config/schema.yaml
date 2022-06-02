@@ -8,6 +8,18 @@ columns:
   DC: float
   ISI: float
   BUI: float
+  FWI: float
   Classes: category
 
 target_column: Classes
+
+selected_features:
+  RH: float
+  Ws: float
+  Rain: float
+  FFMC: float
+  DMC: float
+  DC: float
+  ISI: float
+  BUI: float
+  FWI: float

@@ -1,8 +1,6 @@
-
-
 import os
 import sys
-from app_util import read_yaml_file
+from app_util.util import read_yaml_file
 import pandas as pd
 import dill
 
@@ -11,14 +9,14 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.impute import KNNImputer
 from sklearn.compose import ColumnTransformer
-from app_entity import DataTransformationArtifact
+from app_entity.artifact_entity import DataTransformationArtifact,DataIngestionArtifact, DataValidationArtifact
 
-from app_util import save_object
+from app_util.util import save_object
 from app_util.util import Read_data_MONGO
 from app_config.constants import *
 from app_logger.logger import App_Logger
-from app_exception import AppException
-from app_entity import DataTransformationConfig, DataIngestionArtifact, DataValidationArtifact
+from app_exception.exception import AppException
+from app_entity.config_entity import DataTransformationConfig
 
 # columns:
 #   Temperature: float
@@ -33,7 +31,6 @@ from app_entity import DataTransformationConfig, DataIngestionArtifact, DataVali
 #   Classes: category
 
 Stage02_logger = App_Logger("Stage02_Data_Transformation")
-
 
 
 class DataTransformation:
@@ -67,7 +64,7 @@ class DataTransformation:
             schema = dataset_schema[DATASET_SCHEMA_COLUMNS_KEY]
 
             # reading the dataset
-            dataframe =  Read_data_MONGO(Connection=data_collection_conn, Query={})
+            dataframe = Read_data_MONGO(Connection=data_collection_conn, Query={})
             error_message = ""
             for column in dataframe.columns:
                 if column in list(schema.keys()):
@@ -98,7 +95,7 @@ class DataTransformation:
             columns.remove(target_column)
 
             # creating a pipeline to replace missing values
-            neighbors =  data_transformation_config[KNN_KEY]
+            neighbors = KNN_KEY
             num_pipeline = Pipeline(steps=[
                 ('imputer', KNNImputer(n_neighbors=neighbors)),
                 ('scaler', StandardScaler())])
@@ -112,37 +109,28 @@ class DataTransformation:
         except Exception as e:
             raise AppException(e, sys) from e
 
-
     def initiate_data_transformation(self) -> DataTransformationArtifact:
         try:
             train_collection = self.data_validation_artifact.Train_collection
-            test_collection= self.data_validation_artifact.Test_collection
+            test_collection = self.data_validation_artifact.Test_collection
             schema_file_path = self.data_validation_artifact.schema_file_path
 
-            Stage02_logger.info(f"train file path: [{train_collection}]\n \
-            test file path: [{test_collection}]\n \
+            Stage02_logger.info(f"train collection: [{train_collection}]\n \
+            test collection: [{test_collection}]\n \
             schema_file_path: [{schema_file_path}]\n. ")
 
-            # # loading the dataset
-            # Stage02_logger.info(f"Loading train and test dataset...")
-            # train_dataframe = Read_data_MONGO(Connection=train_collection, Query={})
-            # test_dataframe = Read_data_MONGO(Connection=test_collection, Query={})
-            # loading the dataset
+
             Stage02_logger.info(f"Loading train and test dataset...")
-            train_dataframe = DataTransformation.load_data(data_collection=train_collection,
+            train_dataframe = DataTransformation.load_data(data_collection_conn=train_collection,
                                                            schema_file_path=schema_file_path
                                                            )
 
-            test_dataframe = DataTransformation.load_data(data_collection=train_collection,
+            test_dataframe = DataTransformation.load_data(data_collection_conn=test_collection,
                                                           schema_file_path=schema_file_path)
-            
-
             Stage02_logger.info("Data loaded successfully.")
 
             target_column_name = read_yaml_file(file_path=schema_file_path)[DATASET_SCHEMA_TARGET_COLUMN_KEY]
             Stage02_logger.info(f"Target column name: [{target_column_name}].")
-            
-
             # target_column
             Stage02_logger.info(f"Converting target column into numpy array.")
             train_target = train_dataframe[target_column_name]
@@ -160,12 +148,12 @@ class DataTransformation:
             Stage02_logger.info(f"Creating preprocessing object completed.")
             Stage02_logger.info(f"Preprocessing object learning started on training dataset.")
             Stage02_logger.info(f"Transformation started on training dataset.")
-            train_input = pd.DataFrame(preprocessing.fit_transform(train_dataframe) , columns=train_dataframe.columns)
+            train_input = pd.DataFrame(preprocessing.fit_transform(train_dataframe), columns=train_dataframe.columns)
             Stage02_logger.info(f"Preprocessing object learning completed on training dataset.")
 
             Stage02_logger.info(f"Transformation started on testing dataset.")
             test_input = pd.DataFrame(preprocessing.transform(test_dataframe), columns=test_dataframe.columns)
-            
+
             Stage02_logger.info(f"Transformation completed on testing dataset.")
 
             # adding target column back to the numpy array
@@ -178,6 +166,8 @@ class DataTransformation:
 
             transformed_train_dir = self.data_transformation_config.transformed_train_dir
             transformed_test_dir = self.data_transformation_config.transformed_test_dir
+            os.makedirs(transformed_train_dir, exist_ok=True)
+            os.makedirs(transformed_test_dir, exist_ok=True)
             transformed_train_file_path = os.path.join(transformed_train_dir, PROCEEDED_TRAIN_FILE_NAME)
             transformed_test_file_path = os.path.join(transformed_test_dir, PROCEEDED_TEST_FILE_NAME)
             Stage02_logger.info(f"Transformed train file path: [{transformed_train_file_path}].")
@@ -190,8 +180,8 @@ class DataTransformation:
 
             # writing the transformed data to mongo
             Stage02_logger.info(f"Writing transformed train and test dataset to mongo.")
-            processes_train_collection = self.data_ingestion_artifact.processed_train_collection
-            processes_test_collection = self.data_ingestion_artifact.processed_test_collection
+            processes_train_collection = self.data_transformation_config.processed_train_collection
+            processes_test_collection = self.data_transformation_config.processed_test_collection
             processes_train_collection.Insert_Many(train_data.to_dict('records'))
             processes_test_collection.Insert_Many(test_data.to_dict('records'))
 
@@ -205,7 +195,7 @@ class DataTransformation:
                                                                       message="Data transformed successfully",
                                                                       transformed_train_file_path=transformed_train_file_path,
                                                                       transformed_test_file_path=transformed_test_file_path,
-                                                                      preprocessed_object_file_path=preprocessed_object_file_path ,
+                                                                      preprocessed_object_file_path=preprocessed_object_file_path,
                                                                       train_collection=processes_train_collection,
                                                                       test_collection=processes_test_collection)
             Stage02_logger.info(f"Data Transformation artifact: [{data_transformation_artifact}] created successfully")
@@ -215,5 +205,5 @@ class DataTransformation:
             raise AppException(e, sys) from e
 
     def __del__(self):
-    
+
         Stage02_logger.info(f"{'=' * 20}Data Transformation log ended.{'=' * 20} ")
