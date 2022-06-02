@@ -53,7 +53,8 @@ class DataValidation:
             data_validation_artifact = DataValidationArtifact(is_validated=status,
                                                               message=message,
                                                               schema_file_path=self.data_validation_config.schema_file_path,
-                                                              )
+                                                              Train_collection=self.data_ingestion_artifact.Train_collection,
+                                                              Test_collection = self.data_ingestion_artifact.Test_collection)
             stage_01_logger.info(f"Data validation status: {status}.")
             stage_01_logger.info(
                 f"Data validation artifact: {data_validation_artifact}.")

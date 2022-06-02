@@ -8,18 +8,12 @@ import pymongo
 from app_logger.logger import App_Logger
 from app_exception.exception import AppException
 from app_util.util import read_yaml_file
-
+from app_config.constants import *
 
 
 lg = App_Logger("Database_operations")
 
-ROOT_DIR = os.getcwd()
-CONFIG_DIR = "config"
-DATABASE_CONFIG_FILE_NAME = "database_config.yml"
-DATABASE_CONFIG_FILE_PATH = os.path.join(ROOT_DIR, CONFIG_DIR, DATABASE_CONFIG_FILE_NAME)
-DATA_BASE_CONFIG = read_yaml_file(DATABASE_CONFIG_FILE_PATH)
-CONNECTION_STRING = DATA_BASE_CONFIG['MongoDB']['connection_string']
-DATABASE_NAME = DATA_BASE_CONFIG['MongoDB']['database_name']
+
 
 class MongoDB:
     '''class for mongo db operations'''

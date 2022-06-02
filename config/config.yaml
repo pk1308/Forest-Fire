@@ -21,12 +21,14 @@ data_validation_config:
   schema_file_name: schema.yaml
 
 data_transformation_config:
-  add_bedroom_per_room: true
+  KNN_neighbors : 2
   transformed_dir: transformed_data
   transformed_train_dir: train
   transformed_test_dir: test
   preprocessing_dir: preprocessed
   preprocessed_object_file_name: preprocessed.pkl
+  processed_train_collection: transformed_data_train
+  processed_test_collection: transformed_data_test
 
 model_trainer_config:
   trained_model_dir: trained_model
