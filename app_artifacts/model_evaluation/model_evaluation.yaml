@@ -1,0 +1,5 @@
+best_model:
+  model_path: /home/pk/Desktop/ML Project/Forest-Fire/app_artifacts/model_trainer/2022-06-02-17/trained_model/model.pkl
+history:
+  2022-06-02-17:
+    model_path: /home/pk/Desktop/ML Project/Forest-Fire/app_artifacts/model_trainer/2022-06-02-17/trained_model/model.pkl

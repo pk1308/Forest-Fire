@@ -1,20 +1,20 @@
 from statistics import mode
 from yaml import load
 from app_entity.artifact_entity import DataTransformationArtifact
-from app_logger import logging
-from app_exception import AppException
-from app_entity import ModelEvaluationConfig, ModelTrainerArtifact, DataIngestionArtifact, DataValidationArtifact, \
-    ModelEvaluationArtifact
-from app_config import DATASET_SCHEMA_COLUMNS_KEY, DATASET_SCHEMA_TARGET_COLUMN_KEY, DATASET_SCHEMA_DOMAIN_VALUE_KEY
+from app_logger.logger import App_Logger
+from app_exception.exception import AppException
+from app_entity.artifact_entity import  ModelTrainerArtifact, DataIngestionArtifact, DataValidationArtifact,\
+                                        ModelEvaluationArtifact
+from app_entity.config_entity import ModelEvaluationConfig
+from app_config.constants import *
 import numpy as np
 import os
 import sys
-from app_util import write_yaml_file, read_yaml_file, load_object
-from app_src import DataTransformation, ModelTrainer
+from app_util.util import write_yaml_file, read_yaml_file, load_object
+from app_src.stage_02_data_transformation import DataTransformation
+from app_src.stage_03_model_trainer import  ModelTrainer
 
-BEST_MODEL_KEY = "best_model"
-HISTORY_KEY = "history"
-MODEL_PATH_KEY = "model_path"
+stage_04_logger = App_Logger(__name__)
 
 
 class ModelEvaluation:
@@ -24,7 +24,7 @@ class ModelEvaluation:
                  data_validation_artifact: DataValidationArtifact,
                  model_trainer_artifact: ModelTrainerArtifact):
         try:
-            logging.info(f"{'=' * 20}Model Evaluation log started.{'=' * 20} ")
+            stage_04_logger.info(f"{'=' * 20}Model Evaluation log started.{'=' * 20} ")
             self.model_evaluation_config = model_evaluation_config
             self.model_trainer_artifact = model_trainer_artifact
             self.data_ingestion_artifact = data_ingestion_artifact
@@ -62,7 +62,7 @@ class ModelEvaluation:
             if BEST_MODEL_KEY in model_eval_content:
                 previous_best_model = model_eval_content[BEST_MODEL_KEY]
 
-            logging.info(f"Previous eval result: {model_eval_content}")
+            stage_04_logger.info(f"Previous eval result: {model_eval_content}")
             eval_result = {
                 BEST_MODEL_KEY: {
                     MODEL_PATH_KEY: model_evaluation_artifact.evaluated_model_path,
@@ -78,7 +78,7 @@ class ModelEvaluation:
                     model_eval_content[HISTORY_KEY].update(model_history)
 
             model_eval_content.update(eval_result)
-            logging.info(f"Updated eval result:{model_eval_content}")
+            stage_04_logger.info(f"Updated eval result:{model_eval_content}")
             write_yaml_file(file_path=eval_file_path, data=model_eval_content)
 
         except Exception as e:
@@ -89,45 +89,46 @@ class ModelEvaluation:
             trained_model_file_path = self.model_trainer_artifact.trained_model_file_path
             trained_model_object = load_object(file_path=trained_model_file_path)
 
-            train_file_path = self.data_ingestion_artifact.train_file_path
-            test_file_path = self.data_ingestion_artifact.test_file_path
+            train_collection = self.data_validation_artifact.Train_collection
+            test_collection = self.data_validation_artifact.Test_collection
 
             schema_file_path = self.data_validation_artifact.schema_file_path
 
-            train_dataframe = DataTransformation.load_data(file_path=train_file_path,
-                                                           schema_file_path=schema_file_path,
+            train_dataframe = DataTransformation.load_data(data_collection_conn=train_collection,
+                                                           schema_file_path=schema_file_path
                                                            )
-            test_dataframe = DataTransformation.load_data(file_path=test_file_path,
-                                                          schema_file_path=schema_file_path,
-                                                          )
+
+            test_dataframe = DataTransformation.load_data(data_collection_conn=test_collection,
+                                                          schema_file_path=schema_file_path)
+                                                          
             schema_content = read_yaml_file(file_path=schema_file_path)
             target_column_name = schema_content[DATASET_SCHEMA_TARGET_COLUMN_KEY]
 
             # target_column
-            logging.info(f"Converting target column into numpy array.")
+            stage_04_logger.info(f"Converting target column into numpy array.")
             train_target_arr = np.array(train_dataframe[target_column_name])
             test_target_arr = np.array(test_dataframe[target_column_name])
-            logging.info(f"Conversion completed target column into numpy array.")
+            stage_04_logger.info(f"Conversion completed target column into numpy array.")
 
-            logging.info(f"Converting target column into numpy array.")
+            stage_04_logger.info(f"Converting target column into numpy array.")
             train_target_arr = np.array(train_dataframe[target_column_name])
             test_target_arr = np.array(test_dataframe[target_column_name])
-            logging.info(f"Conversion completed target column into numpy array.")
+            stage_04_logger.info(f"Conversion completed target column into numpy array.")
 
             # dropping target column from the dataframe
-            logging.info(f"Dropping target column from the dataframe.")
+            stage_04_logger.info(f"Dropping target column from the dataframe.")
             train_dataframe.drop(target_column_name, axis=1, inplace=True)
             test_dataframe.drop(target_column_name, axis=1, inplace=True)
-            logging.info(f"Dropping target column from the dataframe completed.")
+            stage_04_logger.info(f"Dropping target column from the dataframe completed.")
 
             model = self.get_best_model()
 
             if model is None:
-                logging.info("Not found any existing model. Hence accepting trained model")
+                stage_04_logger.info("Not found any existing model. Hence accepting trained model")
                 model_evaluation_artifact = ModelEvaluationArtifact(evaluated_model_path=trained_model_file_path,
                                                                     is_model_accepted=True)
                 self.update_evaluation_report(model_evaluation_artifact)
-                logging.info(f"Model accepted. Model eval artifact {model_evaluation_artifact} created")
+                stage_04_logger.info(f"Model accepted. Model eval artifact {model_evaluation_artifact} created")
                 return model_evaluation_artifact
 
             model_list = [model, trained_model_object]
@@ -139,23 +140,23 @@ class ModelEvaluation:
                                                                y_test=test_target_arr,
                                                                base_accuracy=self.model_trainer_artifact.model_accuracy,
                                                                )
-            logging.info(f"Model evaluation completed. model metric artifact: {metric_info_artifact}")
+            stage_04_logger.info(f"Model evaluation completed. model metric artifact: {metric_info_artifact}")
 
             if metric_info_artifact is None:
                 response = ModelEvaluationArtifact(is_model_accepted=False,
                                                    evaluated_model_path=trained_model_file_path
                                                    )
-                logging.info(response)
+                stage_04_logger.info(response)
                 return response
 
             if metric_info_artifact.index_number == 1:
                 model_evaluation_artifact = ModelEvaluationArtifact(evaluated_model_path=trained_model_file_path,
                                                                     is_model_accepted=True)
                 self.update_evaluation_report(model_evaluation_artifact)
-                logging.info(f"Model accepted. Model eval artifact {model_evaluation_artifact} created")
+                stage_04_logger.info(f"Model accepted. Model eval artifact {model_evaluation_artifact} created")
 
             else:
-                logging.info("Trained model is no better than existing model hence not accepting trained model")
+                stage_04_logger.info("Trained model is no better than existing model hence not accepting trained model")
                 model_evaluation_artifact = ModelEvaluationArtifact(evaluated_model_path=trained_model_file_path,
                                                                     is_model_accepted=False)
             return model_evaluation_artifact
@@ -163,4 +164,4 @@ class ModelEvaluation:
             raise AppException(e, sys) from e
 
     def __del__(self):
-        logging.info(f"{'=' * 20}Model Evaluation log completed.{'=' * 20} ")
+        stage_04_logger.info(f"{'=' * 20}Model Evaluation log completed.{'=' * 20} ")

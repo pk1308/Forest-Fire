@@ -80,3 +80,9 @@ KNN_KEY = 2
 PROCEEDED_TRAIN_FILE_NAME = 'processed_train_file.csv'
 PROCEEDED_TEST_FILE_NAME = 'processed_test_file.csv'
 
+
+# model evaluation related variables
+BEST_MODEL_KEY = "best_model"
+HISTORY_KEY = "history"
+MODEL_PATH_KEY = "model_path"
+
