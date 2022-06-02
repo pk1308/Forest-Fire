@@ -1,0 +1,5 @@
+outs:
+- md5: c97426e8d7895ba41b830d0c4396411f.dir
+  size: 10874
+  nfiles: 2
+  path: ingested_data
