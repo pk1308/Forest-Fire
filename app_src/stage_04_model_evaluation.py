@@ -100,7 +100,6 @@ class ModelEvaluation:
 
             test_dataframe = DataTransformation.load_data(data_collection_conn=test_collection,
                                                           schema_file_path=schema_file_path)
-                                                          
             schema_content = read_yaml_file(file_path=schema_file_path)
             target_column_name = schema_content[DATASET_SCHEMA_TARGET_COLUMN_KEY]
 
