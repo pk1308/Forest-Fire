@@ -5,12 +5,11 @@ import sys
 from app_logger.logger import App_Logger
 from app_exception.exception import AppException
 from app_entity.config_entity import ModelTrainerConfig
-from app_entity.artifact_entity import DataTransformationArtifact, MetricInfoArtifact,ModelTrainerArtifact
+from app_entity.artifact_entity import DataTransformationArtifact, MetricInfoArtifact, ModelTrainerArtifact
 from app_src.stage_02_data_transformation import DataTransformation
-from sklearn.metrics import accuracy_score , precision_score , recall_score 
-from app_util.util import load_object, save_object , Read_data_MONGO
+from sklearn.metrics import accuracy_score, precision_score, recall_score
+from app_util.util import load_object, save_object, Read_data_MONGO
 from app_database.mongoDB import MongoDB
-
 
 model_trainer_logger = App_Logger(__name__)
 
@@ -43,7 +42,8 @@ class TrainedModel:
 
 class ModelTrainer:
 
-    def __init__(self, model_trainer_config : ModelTrainerConfig, data_transformation_artifact: DataTransformationArtifact):
+    def __init__(self, model_trainer_config: ModelTrainerConfig,
+                 data_transformation_artifact: DataTransformationArtifact):
         try:
             model_trainer_logger.info(f"{'=' * 20}Model trainer log started.{'=' * 20} ")
             self.model_trainer_config = model_trainer_config
@@ -128,7 +128,6 @@ class ModelTrainer:
             test_file_collection = self.model_trainer_config.test_collection
             test_dataset = Read_data_MONGO(test_file_collection)
             train_dataset = Read_data_MONGO(train_file_collection)
-
 
             X_train, y_train = train_dataset.iloc[:, :-1], train_dataset.iloc[:, -1]
             X_test, y_test = test_dataset.iloc[:, :-1], test_dataset.iloc[:, -1]

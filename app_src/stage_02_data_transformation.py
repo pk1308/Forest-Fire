@@ -9,7 +9,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.impute import KNNImputer
 from sklearn.compose import ColumnTransformer
-from app_entity.artifact_entity import DataTransformationArtifact,DataIngestionArtifact, DataValidationArtifact
+from app_entity.artifact_entity import DataTransformationArtifact, DataIngestionArtifact, DataValidationArtifact
 
 from app_util.util import save_object
 from app_util.util import Read_data_MONGO
@@ -60,7 +60,7 @@ class DataTransformation:
             # reading the dataset schema file
             dataset_schema = read_yaml_file(schema_file_path)
 
-            # extracting the columns info from the schema file
+            # extracting the columns' info from the schema file
             schema = dataset_schema[DATASET_SCHEMA_COLUMNS_KEY]
 
             # reading the dataset
@@ -118,7 +118,6 @@ class DataTransformation:
             Stage02_logger.info(f"train collection: [{train_collection}]\n \
             test collection: [{test_collection}]\n \
             schema_file_path: [{schema_file_path}]\n. ")
-
 
             Stage02_logger.info(f"Loading train and test dataset...")
             train_dataframe = DataTransformation.load_data(data_collection_conn=train_collection,

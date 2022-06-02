@@ -1,8 +1,6 @@
-
 from datetime import datetime
 import os
 import sys
-
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
@@ -141,25 +139,25 @@ class AppConfiguration:
             model_file_path = os.path.join(model_dir, model_trainer_config[MODEL_TRAINER_FILE_NAME_KEY])
 
             base_accuracy = model_trainer_config[MODEL_TRAINER_BASE_ACCURACY_KEY]
-            
-            train_collection = MongoDB(collection_name=data_transformation_config[PROCESSED_TRAIN_COLLECTION_KEY], \
-                                                drop_collection=False)
-            test_collection = MongoDB(collection_name=data_transformation_config[PROCESSED_TEST_COLLECTION_KEY], \
-                                                  drop_collection=False)    
-            randomforest_params =  model_trainer_config[RANDOMFOREST_PARAMS_CONFIG_KEY]
-            randomforest = RandomForestClassifier(**randomforest_params )
-            svc_params =  model_trainer_config [SVC_PARAMS_CONFIG_KEY]
+
+            train_collection = MongoDB(collection_name=data_transformation_config[PROCESSED_TRAIN_COLLECTION_KEY],
+                                       drop_collection=False)
+            test_collection = MongoDB(collection_name=data_transformation_config[PROCESSED_TEST_COLLECTION_KEY],
+                                      drop_collection=False)
+            randomforest_params = model_trainer_config[RANDOMFOREST_PARAMS_CONFIG_KEY]
+            randomforest = RandomForestClassifier(**randomforest_params)
+            svc_params = model_trainer_config[SVC_PARAMS_CONFIG_KEY]
             svc = SVC(**svc_params)
-            gradientboosting_params =  model_trainer_config[GRADIENT_BOOSTING_PARAMS_CONFIG_KEY]
+            gradientboosting_params = model_trainer_config[GRADIENT_BOOSTING_PARAMS_CONFIG_KEY]
             gradientboosting = GradientBoostingClassifier(**gradientboosting_params)
 
             model_list = [randomforest, svc, gradientboosting]
 
-            response = ModelTrainerConfig(trained_model_file_path= model_file_path,
-                                        train_collection = train_collection,
-                                        test_collection = test_collection,
-                                        base_accuracy=base_accuracy,
-                                        model_list = model_list)
+            response = ModelTrainerConfig(trained_model_file_path=model_file_path,
+                                          train_collection=train_collection,
+                                          test_collection=test_collection,
+                                          base_accuracy=base_accuracy,
+                                          model_list=model_list)
 
             config_log.info(f"Model Trainer Config: {response}")
             return response
@@ -199,7 +197,7 @@ class AppConfiguration:
         try:
             training_pipeline_config = self.config_info[TRAINING_PIPELINE_CONFIG_KEY]
             artifact_dir = os.path.join(
-                ROOT_DIR,training_pipeline_config[TRAINING_PIPELINE_ARTIFACT_DIR_KEY])
+                ROOT_DIR, training_pipeline_config[TRAINING_PIPELINE_ARTIFACT_DIR_KEY])
             response = TrainingPipelineConfig(artifact_dir=artifact_dir)
             config_log.info(f"Training Pipeline Config: {response}")
             return response

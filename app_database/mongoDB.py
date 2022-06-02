@@ -8,16 +8,15 @@ from app_exception.exception import AppException
 from app_util.util import read_yaml_file
 from app_config.constants import DATABASE_CONFIG_FILE_PATH
 
-
 lg = App_Logger("Database_operations")
-
 
 DATA_BASE_CONFIG = read_yaml_file(DATABASE_CONFIG_FILE_PATH)
 CONNECTION_STRING = DATA_BASE_CONFIG['MongoDB']['connection_string']
 DATABASE_NAME = DATA_BASE_CONFIG['MongoDB']['database_name']
 
+
 class MongoDB:
-    '''class for mongo db operations'''
+    """class for mongo db operations"""
 
     def __init__(self, collection_name, drop_collection=False):
         """Initialize the class with the database name and collection name
@@ -63,7 +62,7 @@ class MongoDB:
     def Insert_One(self, data):
         """insert one data into mongo dd
         Args:
-            data (formated ): data to be inserted into mongo db
+            data (formatted ): data to be inserted into mongo db
             
             {Key : Value}
             
@@ -81,7 +80,7 @@ class MongoDB:
     def Insert_Many(self, data):
         """insert many data into mongo dd
         Args:
-            data (formated ): data to be inserted into mongo db
+            data (formatted ): data to be inserted into mongo db
             
             {Key : Value}
             
