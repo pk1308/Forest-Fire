@@ -1,7 +1,10 @@
 from datetime import datetime
 import os
 import sys
+from urllib import response
+from flask import Flask
 from sklearn import preprocessing
+from sklearn.compose import ColumnTransformer
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
@@ -10,8 +13,9 @@ from sklearn.ensemble import GradientBoostingClassifier
 from app_logger.logger import App_Logger
 from app_exception.exception import AppException
 from app_entity.config_entity import DataIngestionConfig, DataValidationConfig, DataTransformationConfig, \
-    ModelTrainerConfig, ModelEvaluationConfig
+    ModelTrainerConfig, ModelEvaluationConfig , FlaskConfig
 from app_entity.config_entity import ModelPusherConfig, TrainingPipelineConfig
+from app_pipeline.prediction_pipeline import PredictionPipeline
 from app_util.util import read_yaml_file
 from app_database.mongoDB import MongoDB
 from app_config.constants import *
@@ -207,10 +211,19 @@ class AppConfiguration:
         except Exception as e:
             raise AppException(e, sys) from e
 
-    def get_housing_prediction_model_dir(self) -> str:
+    def get_flask_config(self) -> str:
         try:
             model_pusher_config = self.config_info[MODEL_PUSHER_CONFIG_KEY]
-            return os.path.join(ROOT_DIR, model_pusher_config[MODEL_PUSHER_MODEL_EXPORT_DIR_KEY])
+            data_validation_config = self.config_info[DATA_VALIDATION_CONFIG_KEY]
+            model_dir = os.path.join(ROOT_DIR, model_pusher_config[MODEL_PUSHER_MODEL_EXPORT_DIR_KEY])
+            columns_transformer_dir = os.path.join(ROOT_DIR , model_pusher_config[PREPROCESSING_EXPORT_DIR_KEY])
+            prediction_pipeline = PredictionPipeline(model_dir=model_dir, columns_transformer_dir=columns_transformer_dir)
+            validation_config_dir = data_validation_config[DATA_VALIDATION_CONFIG_DIR]
+            schema_file_path = os.path.join(
+                ROOT_DIR, validation_config_dir, data_validation_config[DATA_VALIDATION_SCHEMA_FILE_NAME_KEY])
+            response = FlaskConfig(prediction_pipeline_obj=prediction_pipeline , 
+                                    schema_file_path = schema_file_path )              
+            return response
         except Exception as e:
             raise AppException(e, sys) from e
 

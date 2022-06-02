@@ -30,3 +30,5 @@ ModelEvaluationConfig = namedtuple("ModelEvaluationConfig", ["model_evaluation_f
 ModelPusherConfig = namedtuple("ModelPusherConfig", ["model_export_dir_path", "preprocessing_export_dir_path"])
 
 TrainingPipelineConfig = namedtuple("TrainingPipelineConfig", ["artifact_dir"])
+
+FlaskConfig = namedtuple("FlaskConfig", ["prediction_pipeline_obj" , "schema_file_path"])

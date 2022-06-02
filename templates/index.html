@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html >
+<!--From https://codepen.io/frytyler/pen/EGdtg-->
+<head>
+  <meta charset="UTF-8">
+  <title>ML API</title>
+  <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Arimo' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Hind:300' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
+
+
+
+
+<form action="/train"></form>
+
+<!-- columns:
+  Temperature: float
+  RH: float
+  Ws: float
+  Rain: float
+  FFMC: float
+  DMC: float
+  DC: float
+  ISI: float
+  BUI: float
+  FWI: float
+  Classes: category -->
+
+<form action="/predict" , >
+  <label for="Temperature">Temperature:</label><br>
+  <input type="text" id="Temperature" name="fname"><br>
+  <label for="RH">RH:</label><br>
+  <input type="text" id="RH" name="RH">
+  <label for="Ws">Ws:</label><br>
+  <input type="text" id="Ws" name="Ws">
+  <label for="Rain">Rain:</label><br>
+  <input type="text" id="Rain" name="Rain">
+  <label for="FFMC">FFMC:</label><br>
+  <input type="text" id="FFMC" name="FFMC">
+  <label for="DMC">DMC:</label><br>
+  <input type="text" id="DMC" name="DMC">
+  <label for="DC">DC:</label><br>
+  <input type="text" id="DC" name="DC">
+  <label for="ISI">ISI:</label><br>
+  <input type="text" id="ISI" name="ISI">
+  <label for="BUI">BUI:</label><br>
+  <input type="text" id="BUI" name="BUI">
+  <label for="FWI">FWI:</label><br>
+  <input type="text" id="FWI" name="FWI">
+  <label for="Classes">Classes:</label><br>
+  <input type="text" id="Classes" name="Classes">
+  <input type="submit" value="Submit">
+</form>
+
+  
+<form action="/eda" , method="post">
+  <input type="submit" value="eda">
+</form>
+
+<form action="/file_predict" , >
+  <label for="file_path">file_path:</label><br>
+  <input type="text" id="file_path" name="fname"><br>
+  <input type="submit" value="file_predict">
+</form>
+
