@@ -57,6 +57,7 @@ MODEL_EVALUATION_ARTIFACT_DIR = "model_evaluation"
 # Model Pusher config key
 MODEL_PUSHER_CONFIG_KEY = "model_pusher_config"
 MODEL_PUSHER_MODEL_EXPORT_DIR_KEY = "model_export_dir"
+PREPROCESSING_EXPORT_DIR_KEY = "preprocessing_export_dir"
 
 # Training pipeline related variable
 TRAINING_PIPELINE_CONFIG_KEY = "training_pipeline_config"

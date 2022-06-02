@@ -18,14 +18,14 @@ stage_04_logger = App_Logger(__name__)
 class ModelEvaluation:
 
     def __init__(self, model_evaluation_config: ModelEvaluationConfig,
-                 data_ingestion_artifact: DataIngestionArtifact,
                  data_validation_artifact: DataValidationArtifact,
-                 model_trainer_artifact: ModelTrainerArtifact):
+                 model_trainer_artifact: ModelTrainerArtifact,
+                 data_transformation_artifact: DataTransformationArtifact):
         try:
             stage_04_logger.info(f"{'=' * 20}Model Evaluation log started.{'=' * 20} ")
             self.model_evaluation_config = model_evaluation_config
             self.model_trainer_artifact = model_trainer_artifact
-            self.data_ingestion_artifact = data_ingestion_artifact
+            self.data_transformation_artifact = data_transformation_artifact
             self.data_validation_artifact = data_validation_artifact
         except Exception as e:
             raise AppException(e, sys) from e
@@ -100,16 +100,15 @@ class ModelEvaluation:
                                                           schema_file_path=schema_file_path)
             schema_content = read_yaml_file(file_path=schema_file_path)
             target_column_name = schema_content[DATASET_SCHEMA_TARGET_COLUMN_KEY]
+            # column = schema_content[DATASET_SCHEMA_COLUMNS_KEY]
+            # column_names = column.keys()
+            preprocessed_object=self.data_transformation_artifact.preprocessed_object
+
 
             # target_column
             stage_04_logger.info(f"Converting target column into numpy array.")
-            train_target_arr = np.array(train_dataframe[target_column_name])
-            test_target_arr = np.array(test_dataframe[target_column_name])
-            stage_04_logger.info(f"Conversion completed target column into numpy array.")
-
-            stage_04_logger.info(f"Converting target column into numpy array.")
-            train_target_arr = np.array(train_dataframe[target_column_name])
-            test_target_arr = np.array(test_dataframe[target_column_name])
+            train_target_arr = train_dataframe[target_column_name]
+            test_target_arr = test_dataframe[target_column_name]
             stage_04_logger.info(f"Conversion completed target column into numpy array.")
 
             # dropping target column from the dataframe
@@ -117,6 +116,10 @@ class ModelEvaluation:
             train_dataframe.drop(target_column_name, axis=1, inplace=True)
             test_dataframe.drop(target_column_name, axis=1, inplace=True)
             stage_04_logger.info(f"Dropping target column from the dataframe completed.")
+            
+            # columns transformation
+            train_dataframe[train_dataframe.columns] = preprocessed_object.transform(train_dataframe)
+            test_dataframe[test_dataframe.columns] = preprocessed_object.transform(test_dataframe)
 
             model = self.get_best_model()
 
@@ -141,7 +144,8 @@ class ModelEvaluation:
 
             if metric_info_artifact is None:
                 response = ModelEvaluationArtifact(is_model_accepted=False,
-                                                   evaluated_model_path=trained_model_file_path
+                                                   evaluated_model_path=trained_model_file_path ,
+                                                   preprocessed_object=preprocessed_object
                                                    )
                 stage_04_logger.info(response)
                 return response

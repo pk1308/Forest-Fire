@@ -1,6 +1,7 @@
 from datetime import datetime
 import os
 import sys
+from sklearn import preprocessing
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
@@ -148,10 +149,8 @@ class AppConfiguration:
             randomforest = RandomForestClassifier(**randomforest_params)
             svc_params = model_trainer_config[SVC_PARAMS_CONFIG_KEY]
             svc = SVC(**svc_params)
-            gradientboosting_params = model_trainer_config[GRADIENT_BOOSTING_PARAMS_CONFIG_KEY]
-            gradientboosting = GradientBoostingClassifier(**gradientboosting_params)
 
-            model_list = [randomforest, svc, gradientboosting]
+            model_list = [randomforest, svc]
 
             response = ModelTrainerConfig(trained_model_file_path=model_file_path,
                                           train_collection=train_collection,
@@ -184,10 +183,14 @@ class AppConfiguration:
         try:
             time_stamp = f"{datetime.now().strftime('%Y%m%d%H%M%S')}"
             model_pusher_config = self.config_info[MODEL_PUSHER_CONFIG_KEY]
-            export_dir_path = os.path.join(ROOT_DIR, model_pusher_config[MODEL_PUSHER_MODEL_EXPORT_DIR_KEY],
+            model_export_dir_path = os.path.join(ROOT_DIR, model_pusher_config[MODEL_PUSHER_MODEL_EXPORT_DIR_KEY],
                                            time_stamp)
+            preprocessing_export_dir_path = os.path.join(ROOT_DIR, model_pusher_config[PREPROCESSING_EXPORT_DIR_KEY] , 
+                                            time_stamp)
 
-            response = ModelPusherConfig(export_dir_path=export_dir_path)
+            response = ModelPusherConfig(model_export_dir_path=model_export_dir_path,
+                                            preprocessing_export_dir_path=preprocessing_export_dir_path)
+                                         
             config_log.info(f"Model pusher config {response}")
             return response
         except Exception as e:

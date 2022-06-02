@@ -131,10 +131,9 @@ class DataTransformation:
             target_column_name = read_yaml_file(file_path=schema_file_path)[DATASET_SCHEMA_TARGET_COLUMN_KEY]
             Stage02_logger.info(f"Target column name: [{target_column_name}].")
             # target_column
-            Stage02_logger.info(f"Converting target column into numpy array.")
             train_target = train_dataframe[target_column_name]
             test_target = test_dataframe[target_column_name]
-            Stage02_logger.info(f"Conversion completed target column into numpy array.")
+            Stage02_logger.info(f"target.")
 
             # dropping target column from the dataframe
             Stage02_logger.info(f"Dropping target column from the dataframe.")
@@ -195,6 +194,7 @@ class DataTransformation:
                                                                       transformed_train_file_path=transformed_train_file_path,
                                                                       transformed_test_file_path=transformed_test_file_path,
                                                                       preprocessed_object_file_path=preprocessed_object_file_path,
+                                                                      preprocessed_object=preprocessing,
                                                                       train_collection=processes_train_collection,
                                                                       test_collection=processes_test_collection)
             Stage02_logger.info(f"Data Transformation artifact: [{data_transformation_artifact}] created successfully")

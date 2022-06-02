@@ -30,8 +30,8 @@ class TrainedModel:
         which guarantees that the inputs are in the same format as the training data
         At last it perform prediction on transformed features
         """
-        transformed_feature = self.preprocessing_object.transform(X)
-        return self.trained_model_object.predict(transformed_feature)
+        
+        return self.trained_model_object.predict(X)
 
     def __repr__(self):
         return f"{type(self.trained_model_object).__name__}()"

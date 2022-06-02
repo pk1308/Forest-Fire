@@ -80,11 +80,13 @@ class TrainingPipeline:
         except Exception as e:
             raise AppException(e, sys) from e
 
-    def start_model_pusher(self, model_eval_artifact: ModelEvaluationArtifact) -> ModelPusherArtifact:
+    def start_model_pusher(self, model_eval_artifact: ModelEvaluationArtifact , 
+                            data_transformation_artifact : DataTransformationArtifact) -> ModelPusherArtifact:
         try:
             model_pusher = ModelPusher(
                 model_pusher_config=self.app_config.get_model_pusher_config(),
-                model_evaluation_artifact=model_eval_artifact
+                model_evaluation_artifact=model_eval_artifact , 
+                data_transformation_artifact=data_transformation_artifact
             )
             return model_pusher.initiate_model_pusher()
         except Exception as e:
@@ -93,13 +95,14 @@ class TrainingPipeline:
     def start_model_evaluation(
             self, data_ingestion_artifact: DataIngestionArtifact,
             data_validation_artifact: DataValidationArtifact,
-            model_trainer_artifact: ModelTrainerArtifact)->ModelEvaluationArtifact:
+            model_trainer_artifact: ModelTrainerArtifact ,
+            data_transformation_artifact : DataTransformationArtifact)->ModelEvaluationArtifact:
         try:
             model_eval = ModelEvaluation(
                 model_evaluation_config=self.app_config.get_model_evaluation_config(),
-                data_ingestion_artifact=data_ingestion_artifact,
                 data_validation_artifact=data_validation_artifact,
-                model_trainer_artifact=model_trainer_artifact)
+                model_trainer_artifact=model_trainer_artifact ,
+                data_transformation_artifact= data_transformation_artifact)
             return model_eval.initiate_model_evaluation()
         except Exception as e:
             raise AppException(e, sys) from e
@@ -122,10 +125,11 @@ class TrainingPipeline:
 
             model_evaluation_artifact = self.start_model_evaluation(data_ingestion_artifact=data_ingestion_artifact,
                                                                     data_validation_artifact=data_validation_artifact,
-                                                                    model_trainer_artifact=model_trainer_artifact)
+                                                                    model_trainer_artifact=model_trainer_artifact,
+                                                                    data_transformation_artifact=data_transformation_artifact)
 
             if model_evaluation_artifact.is_model_accepted:
-                model_pusher_artifact = self.start_model_pusher(model_eval_artifact=model_evaluation_artifact)
+                model_pusher_artifact = self.start_model_pusher(model_eval_artifact=model_evaluation_artifact , data_transformation_artifact=data_transformation_artifact)
                 training_pipeline_logger.info(f'Model pusher artifact: {model_pusher_artifact}')
             else:
                 training_pipeline_logger.info("Trained model rejected.")
