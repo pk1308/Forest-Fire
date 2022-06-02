@@ -72,7 +72,8 @@ class DataIngestion:
             forest_data_frame['Classes'].fillna('Fire', inplace=True)
             forest_data_frame['DC'] = forest_data_frame['DC'].apply(lambda x: x.replace(' ',''))
             forest_data_frame['Classes'] = forest_data_frame['Classes'].apply(lambda x: "No Fire" if 'not' in x.lower() else "Fire")
-
+            forest_data_frame['Classes'] = forest_data_frame['Classes'].map({'Fire':1, 'No Fire':0})
+            
             data_region = forest_data_frame.iloc[1:122, :].copy()
             data_region1 = forest_data_frame.iloc[122:, :].copy()
 

@@ -146,20 +146,20 @@ class AppConfiguration:
                                                 drop_collection=False)
             test_collection = MongoDB(collection_name=data_transformation_config[PROCESSED_TEST_COLLECTION_KEY], \
                                                   drop_collection=False)    
-            randomforest_params = self.config_info[RANDOMFOREST_PARAMS_CONFIG_KEY]
+            randomforest_params =  model_trainer_config[RANDOMFOREST_PARAMS_CONFIG_KEY]
             randomforest = RandomForestClassifier(**randomforest_params )
-            svc_params = self.config_info[SVC_PARAMS_CONFIG_KEY]
+            svc_params =  model_trainer_config [SVC_PARAMS_CONFIG_KEY]
             svc = SVC(**svc_params)
-            gradientboosting_params = self.config_info[GRADIENT_BOOSTING_PARAMS_CONFIG_KEY]
+            gradientboosting_params =  model_trainer_config[GRADIENT_BOOSTING_PARAMS_CONFIG_KEY]
             gradientboosting = GradientBoostingClassifier(**gradientboosting_params)
 
             model_list = [randomforest, svc, gradientboosting]
 
-            response = ModelTrainerConfig(train_collection = train_collection,
-                                            test_collection = test_collection,
-                                        trained_model_file_path=model_file_path,
-                                          base_accuracy=base_accuracy,
-                                          model_list = model_list)
+            response = ModelTrainerConfig(trained_model_file_path= model_file_path,
+                                        train_collection = train_collection,
+                                        test_collection = test_collection,
+                                        base_accuracy=base_accuracy,
+                                        model_list = model_list)
 
             config_log.info(f"Model Trainer Config: {response}")
             return response

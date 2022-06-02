@@ -33,27 +33,27 @@ data_transformation_config:
 model_trainer_config:
   trained_model_dir: trained_model
   model_file_name: model.pkl
-  base_accuracy: 0.6
+  base_accuracy: 0.8
 
-Randomforest_config:
-  bootstrap: False
-  criterion': gini
-  max_features: auto
-  max_leaf_nodes: 2
-  n_estimators: 100
-  n_jobs: -1
-  random_state: 42
+  randomforest_params_config:
+    bootstrap: False
+    criterion: gini
+    max_features: auto
+    max_leaf_nodes: 2
+    n_estimators: 70
+    n_jobs: -1
+    random_state: 42
 
-svc_config:
-  C: 1.1
-  kernel: linear
-  probability: True
-  shrinking: True
+  svc_params_config:
+    C: 0.05
+    kernel: linear
+    probability: True
+    shrinking: True
 
-GradientBoost_config:
-  learning_rate: 6.1
-  max_features: sqrt
-  n_estimators: 50
+  gradientboosting_params_config:
+    learning_rate: 5.1
+    max_features: sqrt
+    n_estimators: 40
 
 
 

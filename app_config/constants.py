@@ -51,7 +51,7 @@ MODEL_TRAINER_FILE_NAME_KEY = "model_file_name"
 MODEL_TRAINER_BASE_ACCURACY_KEY = "base_accuracy"
 RANDOMFOREST_PARAMS_CONFIG_KEY = "randomforest_params_config"
 SVC_PARAMS_CONFIG_KEY = "svc_params_config"
-GRADIENT_BOOSTING_PARAMS_CONFIG_KEY = "GradientBoost_config"
+GRADIENT_BOOSTING_PARAMS_CONFIG_KEY = "gradientboosting_params_config"
 
 # Model Evaluation related variables
 

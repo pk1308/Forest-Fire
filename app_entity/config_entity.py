@@ -19,8 +19,9 @@ DataTransformationConfig = namedtuple("DataTransformationConfig", ["transformed_
                                                                    "processed_train_collection",
                                                                    "processed_test_collection"])
 
-ModelTrainerConfig = namedtuple("ModelTrainerConfig", ["processed_train_collection",
-                                                         'trained_model_file_path',
+ModelTrainerConfig = namedtuple("ModelTrainerConfig", ["trained_model_file_path",
+                                                        "train_collection",
+                                                         'test_collection',
                                                         "base_accuracy",
                                                             "model_list"])   
 

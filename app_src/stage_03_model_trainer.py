@@ -1,15 +1,18 @@
-from cmath import log
-
-from app_logger import logging
-from app_exception import AppException
-from app_entity import ModelTrainerConfig, ModelTrainerArtifact
-from app_entity import DataTransformationArtifact, MetricInfoArtifact
-from app_src import DataTransformation
-from sklearn.metrics import accuracy_score , precision_score , recall_score 
+from cgi import test
 import os
 import sys
-from app_util.util import load_object, save_object , Read_data_MONGO
 
+from app_logger.logger import App_Logger
+from app_exception.exception import AppException
+from app_entity.config_entity import ModelTrainerConfig
+from app_entity.artifact_entity import DataTransformationArtifact, MetricInfoArtifact,ModelTrainerArtifact
+from app_src.stage_02_data_transformation import DataTransformation
+from sklearn.metrics import accuracy_score , precision_score , recall_score 
+from app_util.util import load_object, save_object , Read_data_MONGO
+from app_database.mongoDB import MongoDB
+
+
+model_trainer_logger = App_Logger(__name__)
 
 
 class TrainedModel:
@@ -42,7 +45,7 @@ class ModelTrainer:
 
     def __init__(self, model_trainer_config : ModelTrainerConfig, data_transformation_artifact: DataTransformationArtifact):
         try:
-            logging.info(f"{'=' * 20}Model trainer log started.{'=' * 20} ")
+            model_trainer_logger.info(f"{'=' * 20}Model trainer log started.{'=' * 20} ")
             self.model_trainer_config = model_trainer_config
             self.data_transformation_artifact = data_transformation_artifact
             self.model_list = self.model_trainer_config.model_list
@@ -52,10 +55,10 @@ class ModelTrainer:
     def fit(self, X, y):
         try:
             for model in self.model_list:
-                logging.info(
+                model_trainer_logger.info(
                     f"Started training model: [{type(model).__name__}]")
                 model.fit(X, y)
-                logging.info(
+                model_trainer_logger.info(
                     f"Finished training model: [{type(model).__name__}]")
 
         except Exception as e:
@@ -68,7 +71,7 @@ class ModelTrainer:
             metric_info_artifact = None
             for model in model_list:
                 model_name = str(model)
-                logging.info(
+                model_trainer_logger.info(
                     f"Started evaluating model: [{type(model).__name__}]")
                 y_train_pred = model.predict(X_train)
                 y_test_pred = model.predict(X_test)
@@ -82,7 +85,7 @@ class ModelTrainer:
                 model_accuracy = (2 * (train_acc * test_acc)) / (train_acc + test_acc)
                 diff_test_train_acc = abs(test_acc - train_acc)
                 message = f"{'*' * 20}{model_name} metric info{'*' * 20}"
-                logging.info(f"{message}")
+                model_trainer_logger.info(f"{message}")
 
                 message = f"\n\t\tTrain accuracy: [{train_acc}]."
                 message += f"\n\t\tTest accuracy: [{test_acc}]."
@@ -91,9 +94,9 @@ class ModelTrainer:
                 message += f"\n\t\tModel accuracy: [{model_accuracy}]."
                 message += f"\n\t\tBase accuracy: [{base_accuracy}]."
                 message += f"\n\t\tDiff test train accuracy: [{diff_test_train_acc}]."
-                logging.info(message)
+                model_trainer_logger.info(message)
                 message = f"{'*' * 20}{model_name} metric info{'*' * 20}"
-                logging.info(message)
+                model_trainer_logger.info(message)
 
                 if model_accuracy >= base_accuracy and diff_test_train_acc < 0.05:
                     base_accuracy = model_accuracy
@@ -106,12 +109,12 @@ class ModelTrainer:
                                                               model_accuracy=model_accuracy,
                                                               index_number=index_number)
 
-                    logging.info(
+                    model_trainer_logger.info(
                         f"Acceptable model found {metric_info_artifact}. ")
                 index_number += 1
 
             if metric_info_artifact is None:
-                logging.info(
+                model_trainer_logger.info(
                     f"No model found with higher accuracy than base accuracy")
 
             return metric_info_artifact
@@ -126,8 +129,9 @@ class ModelTrainer:
             test_dataset = Read_data_MONGO(test_file_collection)
             train_dataset = Read_data_MONGO(train_file_collection)
 
-            X_train, y_train = train_dataset[:, :-1], train_dataset[:, -1]
-            X_test, y_test = test_dataset[:, :-1], test_dataset[:, -1]
+
+            X_train, y_train = train_dataset.iloc[:, :-1], train_dataset.iloc[:, -1]
+            X_test, y_test = test_dataset.iloc[:, :-1], test_dataset.iloc[:, -1]
 
             self.fit(X_train, y_train)
             model_metric_artifact = ModelTrainer.evaluate_model(model_list=self.model_list,
@@ -149,9 +153,9 @@ class ModelTrainer:
                 trained_model_object=model_metric_artifact.model_object)
 
             trained_model_path = self.model_trainer_config.trained_model_file_path
-            logging.info(f"Saving trained model to: {trained_model_path}")
+            model_trainer_logger.info(f"Saving trained model to: {trained_model_path}")
             save_object(file_path=trained_model_path, obj=trained_model)
-            logging.info(f"Saved trained model to: {trained_model_path}")
+            model_trainer_logger.info(f"Saved trained model to: {trained_model_path}")
 
             response = ModelTrainerArtifact(is_trained=True,
                                             message="Model trained successfully",
@@ -162,10 +166,10 @@ class ModelTrainer:
                                             test_accuracy=model_metric_artifact.test_accuracy,
                                             model_accuracy=model_metric_artifact.model_accuracy
                                             )
-            logging.info(f"Trained model artifact: {response}.")
+            model_trainer_logger.info(f"Trained model artifact: {response}.")
             return response
         except Exception as e:
             raise AppException(e, sys) from e
 
     def __del__(self):
-        logging.info(f"{'=' * 20}Model trainer log completed.{'=' * 20} ")
+        model_trainer_logger.info(f"{'=' * 20}Model trainer log completed.{'=' * 20} ")
