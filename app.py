@@ -62,19 +62,16 @@ def predict():
             df = pd.DataFrame(data , index = [0])
             print(df)
             prediction = prediction_config.prediction_pipeline_obj.predict(df)
-            print(prediction)
+            
             return send_file(prediction, as_attachment=True)
+            
     except Exception as e:
         return str(e)
 
 
 port = int(os.getenv("PORT", 5000))
 if __name__=="__main__":
-    host = '0.0.0.0'
-    # port = 5000
-    httpd = simple_server.make_server(host, port, app)
-    # print("Serving on %s %d" % (host, port))
-    httpd.serve_forever()
+    app.run()
 
 
 

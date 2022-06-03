@@ -1,0 +1,22 @@
+<html>
+  <head>
+    <title>Altair</title>
+    <meta charset="utf-8">
+
+    <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css" />
+    <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+    <py-env>
+      - altair
+      - pandas
+      - vega_datasets
+    </py-env>
+    </head>
+    <body>
+      <div id="altair" style="width: 100%; height: 100%"></div>
+      <py-script output="altair">
+        import pandas as pd 
+        df = pd.read_csv('https://raw.githubusercontent.com/vega/vega-datasets/master/data/population.csv')
+        print(df.head())
+      </py-script>
+    </body>
+</html>
