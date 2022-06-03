@@ -1,4 +1,0 @@
-!!python/object/new:app_entity.artifact_entity.ModelPusherArtifact
-- true
-- /home/pk/Desktop/ML Project/Forest-Fire/saved_models/20220603000835/model.pkl
-- /home/pk/Desktop/ML Project/Forest-Fire/column_transformer/20220603000835/column_transformer.pkl

@@ -1,66 +1,32 @@
-<!DOCTYPE html>
-<html >
-<!--From https://codepen.io/frytyler/pen/EGdtg-->
-<head>
-  <meta charset="UTF-8">
-  <title>ML API</title>
-  <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
-<link href='https://fonts.googleapis.com/css?family=Arimo' rel='stylesheet' type='text/css'>
-<link href='https://fonts.googleapis.com/css?family=Hind:300' rel='stylesheet' type='text/css'>
-<link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
-
-
-
-
-<form action="/train"></form>
-
-<!-- columns:
-  Temperature: float
-  RH: float
-  Ws: float
-  Rain: float
-  FFMC: float
-  DMC: float
-  DC: float
-  ISI: float
-  BUI: float
-  FWI: float
-  Classes: category -->
-
-<form action="/predict" , >
-  <label for="Temperature">Temperature:</label><br>
-  <input type="text" id="Temperature" name="fname"><br>
-  <label for="RH">RH:</label><br>
-  <input type="text" id="RH" name="RH">
-  <label for="Ws">Ws:</label><br>
-  <input type="text" id="Ws" name="Ws">
-  <label for="Rain">Rain:</label><br>
-  <input type="text" id="Rain" name="Rain">
-  <label for="FFMC">FFMC:</label><br>
-  <input type="text" id="FFMC" name="FFMC">
-  <label for="DMC">DMC:</label><br>
-  <input type="text" id="DMC" name="DMC">
-  <label for="DC">DC:</label><br>
-  <input type="text" id="DC" name="DC">
-  <label for="ISI">ISI:</label><br>
-  <input type="text" id="ISI" name="ISI">
-  <label for="BUI">BUI:</label><br>
-  <input type="text" id="BUI" name="BUI">
-  <label for="FWI">FWI:</label><br>
-  <input type="text" id="FWI" name="FWI">
-  <label for="Classes">Classes:</label><br>
-  <input type="text" id="Classes" name="Classes">
-  <input type="submit" value="Submit">
+<p>{% extends 'base.html' %} {% block head %} {% endblock %} {% block body %}</p>
+    <div class="contemt">
+<h1>Forest Fire Prediction</h1>
+</div>
+<form action="/predict" method="post">
+    <p><label for="Temperature">Temperature:-</label><input name="Temperature" type="int" id="predict"  /></p>
+    <p><label for="Humidity"> Relative Humidity:-</label><input name="RH" type="text" /></p>
+    <p><label for="Wind Speed">Wind Speed:-</label><input name="Ws" type="text"  /></p>
+    <p><label for="Rain">Rain :-</label><input name="Rain" type="text" /></p>
+    <p><label for="FFMC">Fine Fuel Moisture Code (FFMC) :-</label><input name="FFMC" type="text"  /></p>
+    <p><label for="DMC">Duff Moisture Code (DMC):-</label><input name="DMC" type="text"  /></p>
+    <p><label for="DC">Drought Code (DC):-</label><input name="DC" type="text"  /></p>
+    <p><label for="ISI">Initial Spread Index (ISI) :-</label><input name="ISI" type="text"  /></p>
+    <p><label for="BUI">Buildup Index (BUI) :-</label><input name="BUI" type="text"  /></p>
+    <p><label for="FWI">Fire Weather Index (FWI) Index:-</label><input name="FWI" type="text"  /></p>
+    <p><label for="Classes">Class:-</label><input name="Classes" type="text"  /><br /><br /><br />
+    <button type="submit" value="&quot;Predict">Predict</button></p>
 </form>
 
-  
-<form action="/eda" , method="post">
-  <input type="submit" value="eda">
-</form>
+</div>
 
-<form action="/file_predict" , >
-  <label for="file_path">file_path:</label><br>
-  <input type="text" id="file_path" name="fname"><br>
-  <input type="submit" value="file_predict">
-</form>
+<div class="content">
+    <h1 style="text-align: center">File predict</h1>
 
+    <div class="form">
+        <form action="/predictfile" method="POST">
+            <input type="text" name="file" id="content">
+            <input type="submit" value="Predict">
+        </form>
+    </div>
+
+{% endblock %}</p>
