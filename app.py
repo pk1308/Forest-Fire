@@ -11,8 +11,7 @@ import os
 import pandas as pd 
 
 
-AppConfiguration = FlaskAppConfiguration()
-prediction_config = AppConfiguration.get_flask_config()
+
 
 app = Flask(__name__) # create the Flask app
 
@@ -39,6 +38,8 @@ def eda():
 @app.route('/uploader', methods=['POST'])
 @cross_origin()
 def predictfile():
+    AppConfiguration = FlaskAppConfiguration()
+    prediction_config = AppConfiguration.get_flask_config()
     try:
         if request.method == 'POST':
             file = request.files['file']
@@ -58,6 +59,8 @@ def predictfile():
 @app.route('/predict', methods=['POST'])
 @cross_origin()
 def predict():
+    AppConfiguration = FlaskAppConfiguration()
+    prediction_config = AppConfiguration.get_flask_config()
     try:
         if request.method == 'POST':
             data = request.form.to_dict()
