@@ -1,4 +1,4 @@
-from app_config.configuration import AppConfiguration
+from app_config.flask_config import FlaskAppConfiguration
 from app_exception.exception import AppException
 from app_entity.config_entity import FlaskConfig
 from flask import Flask, request
@@ -11,7 +11,7 @@ import os
 import pandas as pd 
 
 
-AppConfiguration = AppConfiguration()
+AppConfiguration = FlaskAppConfiguration()
 prediction_config = AppConfiguration.get_flask_config()
 
 app = Flask(__name__) # create the Flask app
@@ -37,6 +37,7 @@ def eda():
         return str(e)
 
 @app.route('/uploader', methods=['POST'])
+@cross_origin()
 def predictfile():
     try:
         if request.method == 'POST':
@@ -55,6 +56,7 @@ def predictfile():
         return str(e)
         
 @app.route('/predict', methods=['POST'])
+@cross_origin()
 def predict():
     try:
         if request.method == 'POST':
