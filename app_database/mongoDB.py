@@ -10,9 +10,9 @@ from app_config.constants import DATABASE_CONFIG_FILE_PATH
 
 lg = App_Logger("Database_operations")
 
-DATA_BASE_CONFIG = read_yaml_file(DATABASE_CONFIG_FILE_PATH)
-CONNECTION_STRING = DATA_BASE_CONFIG['MongoDB']['connection_string']
-DATABASE_NAME = DATA_BASE_CONFIG['MongoDB']['database_name']
+
+CONNECTION_STRING = os.environ['MONGODB_CONNSTRING']
+DATABASE_NAME = os.environ['MONGODB_DATABASE']
 
 
 class MongoDB:
