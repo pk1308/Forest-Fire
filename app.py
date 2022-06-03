@@ -16,9 +16,11 @@ prediction_config = AppConfiguration.get_flask_config()
 
 app = Flask(__name__) # create the Flask app
 
+
+
 CORS(app)
 
-@app.route('/', methods=['GET'])
+@app.route('/', methods=['POST', 'GET'])
 @cross_origin()
 def index():
     try:
@@ -34,20 +36,24 @@ def eda():
     except Exception as e:
         return str(e)
 
-@app.route('/predictfile', methods=['POST'])
+@app.route('/uploader', methods=['POST'])
 def predictfile():
     try:
         if request.method == 'POST':
-            file = request.form['content']
-            print(file)
-            df = pd.read_csv(file)
-            prediction = prediction_config.prediction_pipeline_obj.predict(df)
-            print(prediction)
-            
-            
-            return send_file(prediction, as_attachment=True)
+            file = request.files['file']
+            if file is not None:
+               
+                df = pd.read_csv(file)
+                print(df)
+
+                prediction = prediction_config.prediction_pipeline_obj.predict(df)
+                print(prediction)
+                return send_file(prediction, as_attachment=True)
+            else:
+                return Response(status=400)
     except Exception as e:
         return str(e)
+        
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
@@ -60,6 +66,8 @@ def predict():
             return send_file(prediction, as_attachment=True)
     except Exception as e:
         return str(e)
+
+
 port = int(os.getenv("PORT", 5000))
 if __name__=="__main__":
     host = '0.0.0.0'
