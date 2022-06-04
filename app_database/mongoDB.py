@@ -16,7 +16,7 @@ lg = App_Logger("Database_operations")
 
 # DATA_BASE_CONFIG = read_yaml_file(DATABASE_CONFIG_FILE_PATH)
 CONNECTION_STRING = os.environ['MONGODB_CONNSTRING']
-DATABASE_NAME = os.environ['MONGODB_DBNAME']
+DATABASE_NAME = os.environ['MONGODB']
 
 class MongoDB:
     """class for mongo db operations"""
